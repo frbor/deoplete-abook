@@ -21,16 +21,15 @@ class Source(Base):
         self.name = 'abook'
         self.mark = '[AB]'
         self.min_pattern_length = 0
-        #self.filetypes = ['mail']
-
+        self.filetypes = ['mail']
 
     def get_complete_position(self, context):
         pos = context['input'].rfind(' ')
         return pos if pos < 0 else pos + 1
 
     def gather_candidates(self, context):
-        #line = str(self.vim.current.window.cursor[0])
-        #column = str(self.vim.current.window.cursor[1] + 1)
+        # line = str(self.vim.current.window.cursor[0])
+        # column = str(self.vim.current.window.cursor[1] + 1)
         line = context["input"]
 
         # Only complete To, CC and BCC headers
@@ -53,7 +52,6 @@ class Source(Base):
             if regexp:
                 results.append("%s <%s>" % (regexp.group("name").strip(), regexp.group("email").strip()))
 
-        log.debug("**** RESULTS:" + str(results))
+        # log.debug("**** RESULTS:" + str(results))
 
-        return [{'word': x} for x in results]
-        #return [{'word': x['name'], 'kind': x['type']} for x in results]
+        return [{'word': x} for x in sorted(results)]
