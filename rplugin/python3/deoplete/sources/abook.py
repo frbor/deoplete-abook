@@ -15,17 +15,24 @@ class Source(Base):
     def __init__(self, vim):
         Base.__init__(self, vim);
 
-        log.debug("**** INIT:")
         self.abook_bin = self.vim.vars['deoplete#sources#abook#abook_bin'] or 'abookija'
         self.rank = 600
         self.name = 'abook'
         self.mark = '[AB]'
         self.min_pattern_length = 0
         self.filetypes = ['mail']
+        # "something" after ":" or ","
+        self.input_pattern = r'((?<=(:|,)\s)|(?<=(:|,)))\w.*?((?=,)|$)'
+        self.input_pattern = '[^:,]+'
+        # self.matchers = ['matcher_fuzzy']
 
     def get_complete_position(self, context):
-        pos = context['input'].rfind(' ')
-        return pos if pos < 0 else pos + 1
+        line = context["input"]
+        pos = max(line.rfind(':'), line.rfind(','))+1
+        if len(line) > pos and line[pos] == " ":
+            pos += 1
+#
+        return pos if pos < 0 else pos
 
     def gather_candidates(self, context):
         # line = str(self.vim.current.window.cursor[0])
@@ -35,9 +42,11 @@ class Source(Base):
         # Only complete To, CC and BCC headers
         if not (line.startswith("To: ") or line.startswith("Cc: ") or line.startswith("Bcc: ")):
             return []
-        command = [self.abook_bin, '--mutt-query', line[line.rfind(" "):]]
 
-        log.debug("****context:" + str(context))
+        # Return all results here. Result is filtered in deoplete
+        command = [self.abook_bin, '--mutt-query', ""]
+
+        # log.debug("****context:" + str(context))
         buf = '\n'.join(self.vim.current.buffer[:])
 
         process = Popen(command, stdout=PIPE, stdin=PIPE)
