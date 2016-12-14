@@ -25,6 +25,6 @@ abook --mutt-query
 ## Configuration
 
 ```
-# Binary path to your abook, defaults to your $PATH flow
+# Binary path to your abook, defaults to your $PATH abook
 let g:deoplete#sources#abook#abook_bin = 'abook'
 ```
